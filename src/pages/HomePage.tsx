@@ -1,44 +1,132 @@
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { movies } from "@/data/movies";
 import MovieCard from "@/components/MovieCard";
+import { motion, AnimatePresence } from 'framer-motion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { title } from "process";
+import { Card } from "@/components/ui/card";
 
 const HomePage = () => {
   const [activeTab, setActiveTab] = useState("now-showing");
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  const slides  = [
+    {
+      title: "Now Showing",
+      image: "/images/s1.avif",
+      description: "Book your tickets now for the ultimate cinema experience with premium seating and state-of-the-art sound.",
+    },
+    {
+      title: "Coming Soon",
+      image: "/images/s2.png",
+      description: "Book your tickets now for the ultimate cinema experience with premium seating and state-of-the-art sound.",
+    },
+    {
+      title: "Coming Soon",
+      image: "/images/s3.webp",
+      description: "Book your tickets now for the ultimate cinema experience with premium seating and state-of-the-art sound.",
+    }
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 3000);
+
+    return () => 
+      clearInterval(interval);
+    }, [slides.length]);
+    const bgVariants = {
+      initial: { scale: 1.1, opacity: 0 },
+      animate: { scale: 1, opacity: 1, transition: { duration: 1 } },
+      exit: { scale: 1.1, opacity: 0, transition: { duration: 1 } }
+    };
+
+    const textVariants = {
+      initial: { y: 20, opacity: 0 },
+      animate: (i: number) => ({ 
+        y: 0, 
+        opacity: 1, 
+        transition: { delay: 0.3 + i * 0.1, duration: 0.8 }
+      }),
+      exit: { y: -20, opacity: 0, transition: { duration: 0.5 } }
+    };
 
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <div className="relative h-[500px] md:h-[600px] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0">
-          <img
-            src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5"
-            alt="Movie Hero"
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={currentSlide}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          variants={bgVariants}
+          className="absolute inset-0 z-0"
+        >
+          <div 
+            className="absolute inset-0 bg-black/40 z-10 hero-pattern"
+            style={{ mixBlendMode: 'multiply' }}
+          />
+          <img 
+            src={slides[currentSlide].image} 
+            alt={slides[currentSlide].title}
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/80 backdrop-blur-sm"></div>
-        </div>
-        <div className="container relative z-10 px-4 text-center">
-          <h1 className="text-3xl md:text-5xl font-bold text-white mb-6 animate-fade-in">
-            Experience Movies Like Never Before
-          </h1>
-          <p className="text-lg md:text-xl text-white/90 mb-8 max-w-2xl mx-auto animate-fade-in">
-            Book your tickets now for the ultimate cinema experience with premium seating and state-of-the-art sound.
-          </p>
-          <div className="animate-slide-up">
-            <Link to="/movies">
-              <Button className="bg-primary hover:bg-primary/90 text-white font-semibold px-6 py-2.5 rounded-full text-lg">
-                <Ticket className="h-5 w-5 mr-2" />
-                Book Tickets
-              </Button>
-            </Link>
+
+        </motion.div>
+
+      </AnimatePresence>
+
+      {/* Hero Text */}
+      <Card className="relative z-20 h-full border-none  justify-center items-center px-4 pt-20 bg-slate-900/50 backdrop-blur-sm">
+        <div className="container mx-auto">
+          <div className="max-w-3xl mx-auto text-center" >
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentSlide}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                className="space-y-6 relative h-[500px] md:h-[600px] flex items-center justify-center overflow-hidden">
+                  <motion.div
+                   custom={0}
+                   variants={textVariants}
+                   className="text-white text-4xl font-bold">
+                    <motion.h1 className="text-3xl md:text-5xl font-bold text-white mb-6 animate-fade-in">
+                          Experience Movies Like Never Before
+
+
+                    </motion.h1>
+                    <p className="text-lg md:text-xl text-white/90 mb-8 max-w-2xl mx-auto animate-fade-in">
+                      Book your tickets now for the ultimate cinema experience with premium seating and state-of-the-art sound.
+                    </p>
+                    <div className="animate-slide-up">
+                    <Link to="/movies">
+                      <Button className="bg-primary hover:bg-primary/90 text-white font-semibold px-6 py-2.5 rounded-full text-lg">
+                                <Ticket className="h-5 w-5 mr-2" />
+                        Book Tickets
+                      </Button>
+                    </Link>
+                  </div>
+                   </motion.div>
+                   
+
+
+                </motion.div>
+            </AnimatePresence>
           </div>
         </div>
-      </div>
+
+
+      </Card>
+
+
+    
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-12">
